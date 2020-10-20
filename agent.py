@@ -10,15 +10,15 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 256        # minibatch size
-GAMMA = 0.995            # discount factor
+BATCH_SIZE = 512        # minibatch size
+GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor
-LR_CRITIC = 5e-3        # learning rate of the critic
-WEIGHT_DECAY = 0.999       # noise weight decay
+LR_CRITIC = 1e-3        # learning rate of the critic
+WEIGHT_DECAY = 0.       # noise weight decay
 
-N_LEARN_UPDATES = 3
-N_LEARN_TIMESTEPS = 4
+N_LEARN_UPDATES = 10
+N_LEARN_TIMESTEPS = 20
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -28,7 +28,7 @@ class Agent(object):
     Interacts with and learns from the environment
     """
 
-    def __init__(self, state_size, action_size, n_agents, random_seed):
+    def __init__(self, state_size, action_size, random_seed):
         """
         Initialize parameters and build an Agent model
         
@@ -39,10 +39,9 @@ class Agent(object):
         
         self.state_size = state_size
         self.action_size = action_size
-        self.n_agents = n_agents
         
-        if random_seed:
-            self.seed = random.seed(random_seed)
+        self.seed = random.seed(random_seed)
+        self.i_learn = 0
 
         # Actor Network
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
@@ -57,7 +56,7 @@ class Agent(object):
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=LR_CRITIC)
 
         # Noise Process
-        self.noise = OUNoise((n_agents, action_size), random_seed)
+        self.noise = OUNoise(2 * action_size, random_seed)
 
         # Replay memory
         self.memory = ReplayBuffer(BUFFER_SIZE, BATCH_SIZE, random_seed)
@@ -183,10 +182,7 @@ class OUNoise:
         self.mu = mu * np.ones(size)
         self.theta = theta
         self.sigma = sigma
-        
-        if seed:
-            self.seed = random.seed(seed)
-            
+        self.seed = random.seed(seed)
         self.reset()
 
     def reset(self):
