@@ -22,11 +22,11 @@ The following hyperparameters were used:
 
 * replay buffer size: 1e5
 * max timesteps: 10000
-* minibatch size: 256
-* discount factor: 0.995
+* minibatch size: 512
+* discount factor: 0.99
 * tau (soft update for target networks factor): 1e-3
-* learning rate: 1e-4 (actor) and 5e-3 (critic)
-* update interval (how often to learn): 4
+* learning rate: 1e-4 (actor) and 1e-3 (critic)
+* update interval (how often to learn): 20
 * noise start (factor for the noise added to the actions selected by the actor): 1.0
 * noise decay factor: 0.999
 * min noise: 0.01
@@ -34,16 +34,20 @@ The following hyperparameters were used:
 #### Neural networks
 The actor model is a simple feedforward network:
 * Input layer: 24 (input) neurons (the state size)
-* 1st hidden layer: 400 neurons (leaky relu)
-* 2nd hidden layer: 300 neurons (leaky relu)
+* 1st hidden layer: 128 neurons (leaky relu)
+* 2nd hidden layer: 128 neurons (leaky relu)
 * output layer: 2 neurons (1 for each action) (tanh)
 
 The critic model:
 * Input layer: 24 (input) neurons (the state size)
-* 1st hidden layer: 404 neurons (action with 2 * action_size 2 added) (leaky relu)
-* 2nd hidden layer: 300 neurons (leaky relu)
+* 1st hidden layer: 132 neurons (action with 2 * action_size 2 added) (leaky relu)
+* 2nd hidden layer: 128 neurons (leaky relu)
 * output layer: 1 neuron
 
-#### Future Improvements
+### Plot of Rewards
+
+![Result](image/figures_scores.png)
+
+### Future Improvements
 The next steps after this submission is to implement Prioritized Experience Replay within the Replay Buffer for improved sampling from saved experiences.
 Hyperparameters can also be further optimized along with the hidden layers of both Actor and Critic models.
